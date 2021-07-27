@@ -18,7 +18,7 @@ public class Postagem {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private long id;
 	
 	@NotNull
 	@Size(min = 5, max = 100)
@@ -30,7 +30,7 @@ public class Postagem {
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date data = new java.sql.Date(System.currentTimeMillis());
-	
+		
 	public long getId() {
 		return id;
 	}
