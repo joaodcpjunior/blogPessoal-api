@@ -1,5 +1,6 @@
 package org.generation.blogPessoal.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -9,7 +10,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -19,37 +21,38 @@ public class Tema {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
-	
-	@NotNull
-	private String descricao;
-	
-	@OneToMany(mappedBy = "tema", cascade = CascadeType.ALL)
-	@JsonIgnoreProperties("tema")
-	private List<Postagem> listaPostagem;
+	private Long id;
 
-	public long getId() {
-		return id;
+	@NotBlank
+	@Size(max = 20, message = "Maximo 20 caracteres")
+	private String tema;
+
+	@OneToMany(mappedBy = "tema", cascade = CascadeType.REMOVE)
+	@JsonIgnoreProperties({ "tema" })
+	private List<Postagem> listaDePostagens = new ArrayList<>();
+
+	public Long getId() {
+		return this.id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public String getDescricao() {
-		return descricao;
+	public String getTema() {
+		return this.tema;
 	}
 
-	public void setDescricao(String descricao) {
-		this.descricao = descricao;
+	public void setTema(String tema) {
+		this.tema = tema;
 	}
 
-	public List<Postagem> getListaPostagem() {
-		return listaPostagem;
+	public List<Postagem> getListaDePostagens() {
+		return this.listaDePostagens;
 	}
 
-	public void setListaPostagem(List<Postagem> listaPostagem) {
-		this.listaPostagem = listaPostagem;
+	public void setListaDePostagens(List<Postagem> listaDePostagens) {
+		this.listaDePostagens = listaDePostagens;
 	}
 
 }
