@@ -45,7 +45,6 @@ public class Usuario {
         this.nome = nome;
         this.email = email;
         this.senha = senha;
-        this.listaPostagem = listaPostagem;
     }
 
     public Long getId() {
