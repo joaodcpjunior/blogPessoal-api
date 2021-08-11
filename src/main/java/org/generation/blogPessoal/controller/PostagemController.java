@@ -1,11 +1,14 @@
 package org.generation.blogPessoal.controller;
 
 import java.util.List;
+import java.util.Optional;
+
+import javax.validation.Valid;
 
 import org.generation.blogPessoal.model.Postagem;
 import org.generation.blogPessoal.repository.PostagemRepository;
+import org.generation.blogPessoal.services.PostagemService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -23,36 +27,71 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostagemController {
 	
 	@Autowired
-	private PostagemRepository repository;
-	
-	@GetMapping(value = "/buscar_tudo")
-	public ResponseEntity<List<Postagem>> findAllPostagem() {
-		return ResponseEntity.ok(repository.findAll());
+	private PostagemRepository postagemRepository;
+
+	@Autowired
+	private PostagemService postagemService;
+
+	@PostMapping("/salvar")
+	public ResponseEntity<Object> cadastrarPostagem(@Valid @RequestBody Postagem novaPostagem) {
+		Optional<?> objetoCadastrado = postagemService.cadastrarPostagem(novaPostagem);
+
+		if (objetoCadastrado.isPresent()) {
+			return ResponseEntity.status(201).body(objetoCadastrado.get());
+		} else {
+			return ResponseEntity.status(400).build();
+		}
+
+	}
+
+	@GetMapping("/todas")
+	public ResponseEntity<Object> buscarTodas() {
+		List<Postagem> listaPostagem = postagemRepository.findAll();
+
+		if (listaPostagem.isEmpty()) {
+			return ResponseEntity.status(204).build();
+		} else {
+			return ResponseEntity.status(200).body(listaPostagem);
+		}
+
 	}
 	
-	@GetMapping(value = "/{id}")
-	public ResponseEntity<Postagem> findByIdPostagem(@PathVariable Long id) {
-		return ResponseEntity.ok(repository.findById(id).get());
+	@GetMapping("/{id_postagem}")
+	public ResponseEntity<Postagem> buscarPorId(@PathVariable(value = "id_postagem") Long id) {
+		Optional<Postagem> objetoPostagem = postagemRepository.findById(id);
+		if (objetoPostagem.isPresent()) {
+			return ResponseEntity.status(200).body(objetoPostagem.get());
+		} else {
+			return ResponseEntity.status(204).build();
+		}
 	}
 	
-	@GetMapping(value = "/titulo/{titulo}")
-	public ResponseEntity<List<Postagem>> getByTitulo(@PathVariable String titulo) {
-		return ResponseEntity.ok(repository.findAllByTituloContainingIgnoreCase(titulo));
+	@GetMapping("/pesquisa")
+	public ResponseEntity<List<Postagem>> buscarPorTitulo(@RequestParam(defaultValue = "") String titulo) {
+		return ResponseEntity.status(200).body(postagemRepository.findAllByTituloContainingIgnoreCase(titulo));
 	}
 	
-	@PostMapping
-	public ResponseEntity<Postagem> post (@RequestBody Postagem postagem) {
-		return ResponseEntity.status(201).body(repository.save(postagem));		
+	@PutMapping("/alterar")
+	public ResponseEntity<Object> alterar(@Valid @RequestBody Postagem postagemParaAlterar) {
+		Optional<Postagem> objetoAlterado = postagemService.alterarPostagem(postagemParaAlterar);
+
+		if (objetoAlterado.isPresent()) {
+			return ResponseEntity.status(201).body(objetoAlterado.get());
+		} else {
+			return ResponseEntity.status(400).build();
+		}
 	}
 	
-	@PutMapping
-	public ResponseEntity<Postagem> put (@RequestBody Postagem postagem) {
-		return ResponseEntity.status(HttpStatus.OK).body(repository.save(postagem));		
-	}
-	
-	@DeleteMapping(value = "/{id}")
-	public void delete(@PathVariable long id) {
-		repository.deleteById(id);
+	@DeleteMapping("/deletar/{id_postagem}")
+	public ResponseEntity<Object> deletarPorId(@PathVariable(value = "id_postagem") Long idPostagem) {
+		Optional<Postagem> objetoExistente = postagemRepository.findById(idPostagem);
+		if (objetoExistente.isPresent()) {
+			postagemRepository.deleteById(idPostagem);
+			return ResponseEntity.status(200).build();
+		} else {
+			return ResponseEntity.status(400).build();
+		}
+		
 	}
 	
 }

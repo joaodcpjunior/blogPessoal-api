@@ -1,18 +1,18 @@
 package org.generation.blogPessoal.model;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
@@ -21,50 +21,71 @@ public class Postagem {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
-	
-	@NotNull
-	@Size(min = 5, max = 100)
+	private Long id;
+
+	@NotBlank
+	@Size(max = 45, message = "Maximo 45 caracteres")
 	private String titulo;
-	
-	@NotNull
-	@Size(min = 10, max = 500)
-	private String texto;
-	
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date data = new java.sql.Date(System.currentTimeMillis());
-	
-	@ManyToOne
-	@JsonIgnoreProperties("listaPostagem")
+
+	@NotBlank
+	@Size(max = 300, message = "Maximo 300 caracteres")
+	private String descricao;
+
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private LocalDate dataPostagem = LocalDate.now();
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JsonIgnoreProperties({ "listaPostagem" })
+	private Usuario criador;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JsonIgnoreProperties({ "listaDePostagens" })
 	private Tema tema;
-		
-	public long getId() {
-		return id;
+
+	public Long getId() {
+		return this.id;
 	}
-	public void setId(long id) {
+
+	public void setId(Long id) {
 		this.id = id;
 	}
+
 	public String getTitulo() {
-		return titulo;
+		return this.titulo;
 	}
+
 	public void setTitulo(String titulo) {
 		this.titulo = titulo;
 	}
-	public String getTexto() {
-		return texto;
+
+	public String getDescricao() {
+		return this.descricao;
 	}
-	public void setTexto(String texto) {
-		this.texto = texto;
+
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
 	}
-	public Date getData() {
-		return data;
+
+	public LocalDate getDataPostagem() {
+		return this.dataPostagem;
 	}
-	public void setData(Date data) {
-		this.data = data;
+
+	public void setDataPostagem(LocalDate dataPostagem) {
+		this.dataPostagem = dataPostagem;
 	}
+
+	public Usuario getCriador() {
+		return this.criador;
+	}
+
+	public void setCriador(Usuario criador) {
+		this.criador = criador;
+	}
+
 	public Tema getTema() {
-		return tema;
+		return this.tema;
 	}
+
 	public void setTema(Tema tema) {
 		this.tema = tema;
 	}
